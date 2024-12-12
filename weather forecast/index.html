@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Forecast</title>
+    <style>
+        /* Static background image */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('http://www.pixelstalk.net/wp-content/uploads/2016/07/Weather-Photo.jpg') no-repeat center center fixed; /* Replace with your image URL */
+            background-size: cover;
+            color: #333;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Header style */
+        header {
+            background-color: rgba(0, 0, 0, 0.5); /* Transparent black background */
+            color: white;
+            padding: 15px 20px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            font-size: 2.5em;
+            text-align: center;
+        }
+
+        /* Search container style */
+        .search-container input, .search-container button {
+            padding: 12px;
+            margin: 10px;
+            border-radius: 5px;
+            border: 1px solid #4caf50;
+            font-size: 1.5em;
+            position: static;
+        }
+
+        /* Button hover effect */
+        .search-container button {
+            background-color: #4caf50;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .search-container button:hover {
+            background-color: #45a049;
+        }
+
+        /* Weather info section */
+        .weather-info {
+            margin-top: 20px;
+            transition: opacity 0.5s ease;
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .weather-info img {
+            width: 100px;
+            height: 100px;
+            animation: iconAnimation 2s infinite;
+        }
+
+        /* @keyframes iconAnimation {
+            0% {
+                transform: rotate(0deg);
+            }
+            50% {
+                transform: rotate(360deg);
+            }
+            100% {
+                transform: rotate(0deg);
+            } */
+        
+
+        /* City name and weather info text */
+        .weather-info p {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+
+        /* Responsive layout */
+        @media screen and (max-width: 600px) {
+            header {
+                font-size: 1.5em;
+            }
+
+            .weather-info p {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        Weather Forecast
+    </header>
+
+    <div class="search-container">
+        <input type="text" id="city" placeholder="Enter city name">
+        <button onclick="fetchWeather()">Search</button>
+    </div>
+
+    <div class="weather-info" style="opacity: 0;">
+        <h2>Current Weather</h2>
+        <p>City: <span id="cityName">-</span></p>
+        <p>Temperature: <span id="temperature">-</span></p>
+        <p>Condition: <span id="condition">-</span></p>
+        <img id="weatherIcon" alt="Weather Icon">
+    </div>
+
+    <script>
+        async function fetchWeather() {
+            const city = document.getElementById('city').value;
+            console.log("City entered:", city);  // Logs city entered
+
+            const apiKey = 'cf8ec2daf13b2c4050a6ed10f28062cd';  // Your API key
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+
+            try {
+                console.log("API URL:", url);  // Logs API request URL
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                console.log("API Response:", data);  // Logs API response
+
+                if (data.cod === 200) {
+                    // Success - Display the weather info
+                    document.getElementById('cityName').textContent = data.name;
+                    document.getElementById('temperature').textContent = `${data.main.temp} °C`;
+                    document.getElementById('condition').textContent = data.weather[0].description;
+                    document.getElementById('weatherIcon').src = `https://openweathermap.org/img/wn/${data.weather[0].icon}.png`;
+
+                    // Fade in weather info
+                    document.querySelector('.weather-info').style.opacity = 1;
+                } else {
+                    // If the city is not found
+                    alert('City not found!');
+                    resetWeatherInfo();
+                }
+            } catch (error) {
+                console.log("Error:", error);  // Logs any error that happens
+                alert('Error fetching weather data!');
+                resetWeatherInfo();
+            }
+        }
+
+        function resetWeatherInfo() {
+            document.getElementById('cityName').textContent = '-';
+            document.getElementById('temperature').textContent = '-';
+            document.getElementById('condition').textContent = '-';
+            document.getElementById('weatherIcon').src = '';
+            document.querySelector('.weather-info').style.opacity = 0;  // Fade out the weather info
+        }
+    </script>
+</body>
+</html>
